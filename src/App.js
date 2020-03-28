@@ -4,8 +4,10 @@ import { Route, Switch } from 'react-router-dom'
 import Header from './components/header/header.component'
 import Homepage from './pages/homepage/hompage.page'
 import ShopPage from './pages/shop/shop.page'
-import SignInAndSignOutPage from './pages/sign-in-and-sign-out/sign-in-and-sign-out.page'
-import { auth } from './firebase/firebase-utils';
+import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.page'
+
+import { auth, createUserProfileDocument } from './firebase/firebase-utils';
+
 import './App.css'
 
 
@@ -22,10 +24,20 @@ class App extends React.Component {
   unSubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unSubscribeFromAuth = auth.onAuthStateChanged( user => {
-      this.setState({ currentUser: user });
+    this.unSubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
 
-      console.log(this.state.currentUser);
+        userRef.onSnapshot( snapShot => {
+          this.setState({
+            id: snapShot.id,
+            ...snapShot.data()
+          }, () => console.log(this.state));
+          console.log(this.state)
+        });
+      }
+
+      this.setState({ currentUser: userAuth });
     })
   }
 
@@ -40,7 +52,7 @@ class App extends React.Component {
         <Switch>
           <Route exact path='/' component={Homepage} ></Route>
           <Route path='/shop' component={ShopPage} ></Route>
-          <Route path='/signin' component={SignInAndSignOutPage} ></Route>
+          <Route path='/signin' component={SignInAndSignUpPage} ></Route>
         </Switch>
       </div>
     );
