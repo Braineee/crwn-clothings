@@ -1,5 +1,5 @@
 import { CartActionTypes } from './cart.types';
-import { addItemToCart } from './cart.utils';
+import { addItemToCart, removeItemFromCart, reduceItemQuantity } from './cart.utils';
 
 const INITIAL_STATE = {
   hidden: true,
@@ -22,6 +22,22 @@ const cartReducer = (state = INITIAL_STATE, action) => {
           cartItems: addItemToCart(state.cartItems, action.payload)
         }
         // eslint-disable-next-line
+      break;
+    
+    case CartActionTypes.REMOVE_ITEM:
+      return {
+        ...state,
+        cartItems: removeItemFromCart(state.cartItems, action.payload)
+      }
+      // eslint-disable-next-line
+      break;
+
+    case CartActionTypes.REDUCE_QUANTITY:
+      return {
+        ...state,
+        cartItems: reduceItemQuantity(state.cartItems, action.payload)
+      }
+      // eslint-disable-next-line
       break;
   
     default:
